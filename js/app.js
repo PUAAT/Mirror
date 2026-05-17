@@ -1,18 +1,18 @@
-// ================= 1. 照片資料自動生成 (pic1 ~ pic26) =================
+// ================= 1. 照片資料庫 (pic1 ~ pic26) =================
 const totalPhotos = 26; 
-const photoData = [];
+let photoData = [];
 
 for (let i = 1; i <= totalPhotos; i++) {
     photoData.push({
-        src: `images/pic${i}.jpg`, // 確保你的照片是 .jpg 結尾，如果是 .png 請改這裡
-        title: `魔法回憶碎片 ${i}`,
-        desc: `我們在靜宜校園留下的歡笑與奇蹟。`
+        src: `images/pic${i}.jpg`, // 確保照片都是 .jpg，如為 png 請修改這裡
+        title: `Mirror the miracle`,
+        desc: `第十五屆領頭羊 ‧ 魔法記憶碎片 #${i}`
     });
 }
 
-// ================= 2. 隨機打亂陣列功能 (洗牌演算法) =================
+// 洗牌演算法
 function shuffleArray(array) {
-    let shuffled = [...array]; // 複製一份，不影響原陣列
+    let shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -20,28 +20,7 @@ function shuffleArray(array) {
     return shuffled;
 }
 
-// ================= 3. 動態渲染相簿網格 =================
-function renderGallery() {
-    const grid = document.getElementById('dynamic-grid');
-    grid.innerHTML = ''; // 先清空畫面
-    
-    // 將 26 張照片隨機打亂後顯示
-    const randomPhotos = shuffleArray(photoData);
-
-    randomPhotos.forEach(photo => {
-        const card = document.createElement('div');
-        card.className = 'photo-card';
-        card.onclick = () => openLightbox(photo.src, photo.title, photo.desc);
-        
-        card.innerHTML = `
-            <img src="${photo.src}" alt="${photo.title}">
-            <div class="card-title">${photo.title}</div>
-        `;
-        grid.appendChild(card);
-    });
-}
-
-// ================= 4. 攝影機初始化 =================
+// ================= 2. 攝影機初始化 =================
 document.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('webcam');
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -49,88 +28,82 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(stream => { video.srcObject = stream; })
             .catch(error => {
                 console.error("無法存取攝影機:", error);
-                document.querySelector('.magic-text p').innerText = "(請允許瀏覽器開啟攝影機權限)";
+                document.querySelector('.pulse-text').innerText = "(請允許瀏覽器開啟攝影機權限以喚醒魔鏡)";
             });
     }
 });
 
-// ================= 5. 視圖切換與進入相簿 =================
-function shatterMirror() {
-    const mirrorFrame = document.querySelector('.mirror-frame');
-    mirrorFrame.classList.add('shatter-anim');
+// ================= 3. 魔鏡互動邏輯 =================
+let isPlaying = false;
+let slideshowInterval = null;
+let currentPlaylist = [];
+let currentIndex = 0;
+
+function toggleMagic() {
+    const mirror = document.getElementById('magic-mirror');
     
-    setTimeout(() => {
-        renderGallery(); // 進入相簿前，先隨機生成網格
-        switchView('gallery-view');
-        document.getElementById('main-nav').classList.remove('hidden');
-    }, 800);
-}
+    if (!isPlaying) {
+        // --- 啟動魔法回憶 ---
+        isPlaying = true;
+        mirror.classList.add('playing-magic'); // 觸發 CSS 霧化與變暗動畫
+        
+        // 準備照片
+        currentPlaylist = shuffleArray(photoData);
+        currentIndex = 0;
+        
+        // 延遲 1 秒，等霧化動畫稍微跑完再浮現第一張照片
+        setTimeout(() => {
+            showNextMemory(); 
+            // 設定每 4.5 秒自動換下一張
+            slideshowInterval = setInterval(showNextMemory, 4500);
+        }, 1000);
 
-function switchView(targetViewId) {
-    const views = document.querySelectorAll('.view');
-    views.forEach(view => {
-        view.classList.remove('active');
-        setTimeout(() => view.classList.add('hidden'), 500); 
-    });
-
-    const targetView = document.getElementById(targetViewId);
-    targetView.classList.remove('hidden');
-    setTimeout(() => targetView.classList.add('active'), 50);
-
-    if (targetViewId === 'mirror-view') {
-        document.querySelector('.mirror-frame').classList.remove('shatter-anim');
-        document.getElementById('main-nav').classList.add('hidden');
-    }
-}
-
-// ================= 6. 燈箱邏輯與隨機輪播播放 =================
-let slideshowInterval = null; // 用來記錄播放器的計時器
-
-function openLightbox(imgSrc, title, desc) {
-    const lightbox = document.getElementById('lightbox');
-    const imgElement = document.getElementById('lightbox-img');
-    
-    // 添加一個淡入效果
-    imgElement.style.opacity = 0;
-    setTimeout(() => {
-        imgElement.src = imgSrc;
-        document.getElementById('lightbox-title').innerText = title;
-        document.getElementById('lightbox-desc').innerText = desc;
-        imgElement.style.opacity = 1;
-    }, 200);
-    
-    lightbox.classList.remove('hidden');
-}
-
-function closeLightbox() {
-    document.getElementById('lightbox').classList.add('hidden');
-    // 關閉燈箱時，必須停止自動播放
-    if (slideshowInterval) {
+    } else {
+        // --- 關閉魔法回憶 (回到照鏡子狀態) ---
+        isPlaying = false;
         clearInterval(slideshowInterval);
-        slideshowInterval = null;
+        
+        // 隱藏當前照片
+        document.getElementById('memory-img').style.opacity = 0;
+        document.getElementById('memory-caption').style.opacity = 0;
+        
+        // 移除 CSS 魔法狀態，鏡子會慢慢清晰
+        mirror.classList.remove('playing-magic');
     }
 }
 
-// 點擊背景關閉
-document.getElementById('lightbox').addEventListener('click', function(e) {
-    if(e.target === this) closeLightbox();
-});
+// ================= 4. 輪播播放器 =================
+function showNextMemory() {
+    if (!isPlaying) return; // 如果已經關閉就不執行
 
-// 啟動隨機輪播
-function startRandomSlideshow() {
-    const randomPhotos = shuffleArray(photoData); // 取得一組隨機順序的照片
-    let currentIndex = 0;
+    const imgElement = document.getElementById('memory-img');
+    const captionElement = document.getElementById('memory-caption');
+    const titleElement = document.getElementById('caption-title');
+    const descElement = document.getElementById('caption-desc');
 
-    // 先打開第一張
-    openLightbox(randomPhotos[currentIndex].src, randomPhotos[currentIndex].title, randomPhotos[currentIndex].desc);
+    // 1. 先把舊照片淡出
+    imgElement.style.opacity = 0;
+    captionElement.style.opacity = 0;
+    imgElement.style.transform = 'scale(0.95)';
 
-    // 設定每 3 秒 (3000毫秒) 自動切換下一張
-    slideshowInterval = setInterval(() => {
+    // 2. 延遲 0.8 秒 (等淡出完畢) 後替換照片，再淡入新照片
+    setTimeout(() => {
+        // 換照片與文字
+        const currentPhoto = currentPlaylist[currentIndex];
+        imgElement.src = currentPhoto.src;
+        titleElement.innerText = currentPhoto.title;
+        descElement.innerText = currentPhoto.desc;
+
+        // 淡入並微微放大 (創造浮現感)
+        imgElement.style.opacity = 1;
+        captionElement.style.opacity = 1;
+        imgElement.style.transform = 'scale(1)';
+
+        // 索引加一，如果播完了就重新洗牌
         currentIndex++;
-        // 如果 26 張播完了，就從頭開始循環
-        if (currentIndex >= randomPhotos.length) {
-            currentIndex = 0; 
+        if (currentIndex >= currentPlaylist.length) {
+            currentPlaylist = shuffleArray(photoData);
+            currentIndex = 0;
         }
-        openLightbox(randomPhotos[currentIndex].src, randomPhotos[currentIndex].title, randomPhotos[currentIndex].desc);
-    }, 3000);
+    }, 800);
 }
