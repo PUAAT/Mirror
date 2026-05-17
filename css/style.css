@@ -1,7 +1,7 @@
 :root {
     --gold: #d4af37;
     --gold-light: #fef08a;
-    --bg-dark: #050505;
+    --bg-dark: #020202; /* 營造深邃的空間感 */
 }
 
 body, html {
@@ -12,79 +12,103 @@ body, html {
     overflow: hidden;
 }
 
-/* ================= 魔鏡外框 ================= */
+/* ================= 1. 魔鏡外框與呼吸光 ================= */
 .mirror-frame {
     position: relative; 
     width: 90vw; height: 90vh; max-width: 800px; max-height: 1200px;
     border: 15px solid #8b7355; 
-    border-image: linear-gradient(45deg, #b8860b, #ffd700, #b8860b) 1;
-    box-shadow: 0 0 60px rgba(218, 165, 32, 0.4), inset 0 0 50px #000;
+    border-image: linear-gradient(45deg, #2a2012, #b8860b, #ffd700, #b8860b, #2a2012) 1;
+    /* 加入邊框的呼吸光特效 */
+    box-shadow: 0 0 60px rgba(218, 165, 32, 0.4), inset 0 0 80px #000;
+    animation: frame-glow 4s infinite alternate;
     overflow: hidden; cursor: pointer;
 }
 
-/* ================= 各圖層設定 (絕對定位疊加) ================= */
-#webcam, #fog-layer, #memory-layer, #ui-layer {
+@keyframes frame-glow {
+    0% { box-shadow: 0 0 30px rgba(218, 165, 32, 0.2), inset 0 0 50px #000; }
+    100% { box-shadow: 0 0 80px rgba(218, 165, 32, 0.6), inset 0 0 100px #000; }
+}
+
+/* ================= 2. 各圖層疊加設定 ================= */
+#webcam, #fog-layer, #memory-layer, #ui-layer, #magic-dust {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
 }
 
-/* 1. 攝影機層 */
+/* 攝影機層 (底層) */
 #webcam {
     object-fit: cover; transform: scaleX(-1);
-    filter: contrast(1.1) brightness(0.9) sepia(0.3);
-    transition: filter 2s ease, transform 2s ease;
+    filter: contrast(1.15) brightness(0.8) sepia(0.3) hue-rotate(-5deg);
+    transition: filter 2s ease, transform 2.5s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* 2. 霧氣轉場層 */
+/* 粒子畫布層 (星塵) */
+#magic-dust { pointer-events: none; z-index: 2; opacity: 0.6; mix-blend-mode: screen; }
+
+/* 霧氣轉場層 */
 #fog-layer {
-    background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.9) 100%);
-    backdrop-filter: blur(0px); /* 初始無模糊 */
+    background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.95) 100%);
+    backdrop-filter: blur(0px); 
     transition: backdrop-filter 2s ease, background 2s ease;
-    pointer-events: none;
+    pointer-events: none; z-index: 3;
 }
 
-/* 3. 回憶播放層 */
+/* 回憶播放層 */
 #memory-layer {
     display: flex; flex-direction: column; justify-content: center; align-items: center;
     opacity: 0; transition: opacity 1.5s ease;
-    pointer-events: none; background: rgba(0,0,0,0.5);
+    pointer-events: none; background: rgba(0,0,0,0.4); z-index: 4;
 }
 #memory-img {
     width: 80%; height: 60%; object-fit: contain;
-    border-radius: 10px; box-shadow: 0 0 30px rgba(212,175,55,0.3);
+    border-radius: 12px; box-shadow: 0 0 40px rgba(212,175,55,0.4);
     opacity: 0; transition: opacity 1s ease, transform 1.5s ease;
-    transform: scale(0.95);
+    transform: scale(0.9) translateY(20px); /* 增加浮現的動態感 */
 }
 #memory-caption {
     margin-top: 30px; text-align: center; color: #fff;
-    opacity: 0; transition: opacity 1s ease;
-    text-shadow: 0 2px 10px #000;
+    opacity: 0; transition: opacity 1s ease; text-shadow: 0 5px 15px #000;
 }
-#caption-title { color: var(--gold); font-size: 2rem; margin: 0 0 10px 0; letter-spacing: 2px;}
-#caption-desc { font-size: 1.2rem; margin: 0; color: #ddd; }
+#caption-title { color: var(--gold); font-size: 2.2rem; margin: 0 0 10px 0; letter-spacing: 3px;}
+#caption-desc { font-size: 1.2rem; margin: 0; color: #eee; }
 
-/* 4. UI 提示層 */
+/* UI 提示層 (頂層) */
 #ui-layer {
     display: flex; flex-direction: column; justify-content: center; align-items: center;
-    text-align: center; background: radial-gradient(circle, rgba(0,0,0,0.2), rgba(0,0,0,0.8));
-    transition: opacity 1s ease; pointer-events: none;
+    text-align: center; background: radial-gradient(circle, rgba(0,0,0,0.1), rgba(0,0,0,0.8));
+    transition: opacity 1s ease; pointer-events: none; z-index: 5;
 }
-.magic-text h1 { font-size: 4.5rem; color: var(--gold-light); text-shadow: 0 0 20px var(--gold); margin: 0; }
-.pulse-text { font-size: 1.5rem; color: #fff; margin-top: 20px; animation: pulse 2s infinite; }
+.magic-text h1 { font-size: 4.5rem; color: var(--gold-light); text-shadow: 0 0 30px var(--gold); margin: 0; }
+.pulse-text { font-size: 1.5rem; color: #fff; margin-top: 20px; animation: pulse 2.5s infinite; letter-spacing: 2px;}
 
 @keyframes pulse {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; text-shadow: 0 0 15px #fff; }
-    100% { opacity: 0.5; }
+    0% { opacity: 0.4; transform: scale(0.98); }
+    50% { opacity: 1; text-shadow: 0 0 20px #fff; transform: scale(1); }
+    100% { opacity: 0.4; transform: scale(0.98); }
 }
 
-/* ================= 魔法啟動狀態 (播放回憶時) ================= */
+/* ================= 3. 點擊水波紋特效 ================= */
+.ripple {
+    position: absolute; border-radius: 50%;
+    border: 2px solid rgba(212, 175, 55, 0.8);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.6), inset 0 0 20px rgba(212, 175, 55, 0.4);
+    animation: ripple-anim 1s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    pointer-events: none; z-index: 10;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes ripple-anim {
+    0% { width: 0; height: 0; opacity: 1; }
+    100% { width: 400px; height: 400px; opacity: 0; border-width: 0px;}
+}
+
+/* ================= 4. 魔法啟動狀態 ================= */
 .mirror-frame.playing-magic #webcam {
-    filter: contrast(1) brightness(0.3) sepia(0.5); /* 攝影機變暗 */
-    transform: scaleX(-1) scale(1.1); /* 微微放大產生深邃感 */
+    filter: contrast(1.1) brightness(0.2) sepia(0.6); 
+    transform: scaleX(-1) scale(1.15); /* 畫面變暗並放大產生深邃感 */
 }
 .mirror-frame.playing-magic #fog-layer {
-    backdrop-filter: blur(15px); /* 鏡面起霧 */
-    background: radial-gradient(circle, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.95) 100%);
+    backdrop-filter: blur(18px); 
+    background: radial-gradient(circle, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.98) 100%);
 }
 .mirror-frame.playing-magic #memory-layer { opacity: 1; }
-.mirror-frame.playing-magic #ui-layer { opacity: 0; } /* 隱藏首頁文字 */
+.mirror-frame.playing-magic #ui-layer { opacity: 0; }

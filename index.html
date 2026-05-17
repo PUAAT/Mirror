@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mirror the Miracle - 專屬魔鏡</title>
+    <title>Mirror the Miracle</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
     <main id="app-container">
-        <div id="magic-mirror" class="mirror-frame" onclick="toggleMagic()">
+        <div id="magic-mirror" class="mirror-frame" onclick="toggleMagic(event)">
             
             <video id="webcam" autoplay playsinline></video>
+            
+            <canvas id="magic-dust"></canvas>
             
             <div id="fog-layer"></div>
 
@@ -26,10 +28,9 @@
             <div id="ui-layer">
                 <div class="magic-text">
                     <h1>Mirror the miracle</h1>
-                    <p class="pulse-text">— 輕觸魔鏡，喚醒我們的奇蹟 —</p>
+                    <p class="pulse-text">— 點擊鏡面，釋放魔法 —</p>
                 </div>
             </div>
-            
         </div>
     </main>
 
