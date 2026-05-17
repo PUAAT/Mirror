@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mirror the Miracle - 第十五屆領頭羊</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <nav id="main-nav" class="hidden">
+        <div class="logo">Mirror the miracle</div>
+        <ul class="nav-links">
+            <li><a href="#" onclick="switchView('gallery-view')"><i class="fas fa-images"></i> 魔法修行</a></li>
+            <li><a href="#" onclick="switchView('about-view')"><i class="fas fa-scroll"></i> 家族精神</a></li>
+            <li><a href="#" onclick="switchView('mirror-view')"><i class="fas fa-magic"></i> 再次喚醒魔鏡</a></li>
+        </ul>
+    </nav>
+
+    <main id="app-container">
+
+        <section id="mirror-view" class="view active">
+            <div class="mirror-frame">
+                <video id="webcam" autoplay playsinline></video>
+                <div class="overlay" onclick="shatterMirror()">
+                    <div class="magic-text">
+                        <h1>Mirror the miracle</h1>
+                        <p>— 輕觸魔鏡，解開這份奇蹟 —</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="gallery-view" class="view hidden">
+            <header class="section-header">
+                <h2>拾起魔杖 舞出未來</h2>
+                <p>點擊照片，或讓魔鏡為你隨機播放我們的專屬記憶</p>
+                <button class="action-btn" onclick="startRandomSlideshow()">
+                    <i class="fas fa-play"></i> 魔鏡隨機播放
+                </button>
+            </header>
+            
+            <div class="photo-grid" id="dynamic-grid"></div>
+        </section>
+
+        <section id="about-view" class="view hidden">
+            <div class="about-content">
+                <i class="fas fa-crown gold-icon"></i>
+                <h2>「魔鏡啊魔鏡，誰是這世界上最棒的領頭羊？」</h2>
+                <h3 class="highlight">：第十五屆領頭羊就是。</h3>
+                <div class="divider"></div>
+                <p>語言是我們的魔法，施展於內心的魔鏡。</p>
+                <p>英文寰外家族以「Mirror the miracle」為名，<br>讓陪伴時光映照最燦爛的光芒，在靜宜校園留下珍貴的歡笑奇蹟。</p>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="lightbox" class="hidden">
+        <span class="close-btn" onclick="closeLightbox()">&times;</span>
+        <div class="lightbox-content">
+            <img id="lightbox-img" src="" alt="放大照片">
+            <div class="lightbox-caption">
+                <h3 id="lightbox-title">標題</h3>
+                <p id="lightbox-desc">描述</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
